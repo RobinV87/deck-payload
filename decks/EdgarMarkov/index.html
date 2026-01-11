@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTROOT // TACTICAL HUD</title>
+    <title>GHOSTROOT // EDGAR_MARKOV.SYS</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --neon-blue: #00f2ff;
@@ -102,7 +103,7 @@
     <div class="header">
         <div>
             <div style="font-size: 0.7rem;">USER: GHOSTROOT</div>
-            <div style="font-size: 1.5rem; font-weight: bold;">[ Edgar Markov ]</div>
+            <div style="font-size: 1.5rem; font-weight: bold;">[ EDGAR MARKOV ]</div>
         </div>
         <div class="status-blink">● LIVE_FEED</div>
     </div>
@@ -111,8 +112,8 @@
         <h2>TACTICAL OVERVIEW</h2>
         <div class="stats-grid">
             <div class="stat-box">
-                <span style="font-size: 0.7rem;">POWER LEVEL</span>
-                <span class="stat-value">7.5</span>
+                <span style="font-size: 0.7rem;">TOTAL VALUE</span>
+                <span id="deck-price" class="stat-value">SCANNING...</span>
             </div>
             <div class="stat-box">
                 <span style="font-size: 0.7rem;">WIN RATE</span>
@@ -121,63 +122,23 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="panel">
-    <h2>STRATEGIC ANALYSIS</h2>
-    <div class="stats-grid">
-        <div class="stat-box">
-            <span style="font-size: 0.7rem;">WIN RATE</span>
-            <span class="stat-value" style="color: #00f2ff;">34%</span>
-            <span style="font-size: 0.5rem; opacity: 0.6;">(OPTIMAL FOR 4P POD)</span>
+    <div class="panel">
+        <h2>STRATEGIC ANALYSIS</h2>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span style="font-size: 0.7rem;">POWER LEVEL</span>
+                <span class="stat-value">7.5</span>
+            </div>
+            <div class="stat-box">
+                <span style="font-size: 0.7rem;">AVG MANA VALUE</span>
+                <span id="deck-cmc" class="stat-value">2.53</span>
+            </div>
         </div>
-        <div class="stat-box">
-            <span style="font-size: 0.7rem;">AVG MANA VALUE</span>
-            <span class="stat-value">2.53</span>
-        </div>
-    </div>
-    
-    <div style="margin-top: 15px; height: 120px;">
-        <canvas id="manaCurve"></canvas>
-    </div>
-</div>
-
-// CONFIG: Replace with your actual Deck ID
-const deckId = '32hrkfk7C0qOt-B59XEfXQ'; 
-
-async function getMoxfieldData() {
-    try {
-        // Moxfield's public API endpoint
-        const response = await fetch(`https://api2.moxfield.com/v2/decks/all/${deckId}`);
-        const data = await response.json();
-
-        // 1. Update Total Deck Price (TCGPlayer Market)
-        // Moxfield stores total price in the 'totals' object
-        const totalPrice = data.totals?.usd?.toFixed(2) || '0.00';
-        document.getElementById('deck-price').innerText = `$${totalPrice}`;
-
-        // 2. Update Mana Curve Data dynamically
-        // Moxfield provides 'manaCurve' as an object
-        // We map it to our chart labels [1, 2, 3, 4, 5, 6+]
-        const curveData = [
-            data.manaCurve['1'] || 0,
-            data.manaCurve['2'] || 0,
-            data.manaCurve['3'] || 0,
-            data.manaCurve['4'] || 0,
-            data.manaCurve['5'] || 0,
-            (data.manaCurve['6'] || 0) + (data.manaCurve['7'] || 0) + (data.manaCurve['8'] || 0)
-        ];
         
-        // Update the Chart.js instance (ensure myChart is globally accessible)
-        myChart.data.datasets[0].data = curveData;
-        myChart.update();
-
-    } catch (e) {
-        console.error("Machine Spirit failure:", e);
-        document.getElementById('deck-price').innerText = 'ENCRYPTED';
-    }
-}
-getMoxfieldData();
+        <div style="margin-top: 15px; height: 120px;">
+            <canvas id="manaCurve"></canvas>
+        </div>
+    </div>
 
     <div class="panel">
         <h2>COMBO TRIGGERS</h2>
@@ -197,9 +158,76 @@ getMoxfieldData();
     </div>
 
     <a href="https://moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">VIEW FULL MANIFEST (MOXFIELD)</a>
+    
     <div style="text-align: center; font-size: 0.6rem; margin-top: 20px; opacity: 0.5;">
         SECURE CONNECTION ESTABLISHED // GHOSTROOT_OS v4.0
     </div>
 
+    <script>
+        const deckId = '32hrkfk7C0qOt-B59XEfXQ'; 
+        
+        // Initialize Chart first
+        const ctx = document.getElementById('manaCurve').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6+'],
+                datasets: [{
+                    label: 'MANA CURVE',
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(0, 242, 255, 0.2)',
+                    borderColor: '#00f2ff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false },
+                    x: { ticks: { color: '#00f2ff', font: { family: 'Share Tech Mono' } } }
+                }
+            }
+        });
+
+        async function getMoxfieldData() {
+            // Using a public CORS proxy to bypass security blocks
+            const proxy = 'https://corsproxy.io/?'; 
+            const apiUrl = `${proxy}https://api2.moxfield.com/v2/decks/all/${deckId}`;
+
+            try {
+                const response = await fetch(apiUrl); //
+                const data = await response.json(); //
+
+                // Update Total Deck Price
+                const totalPrice = data.totals?.usd?.toFixed(2) || '0.00';
+                document.getElementById('deck-price').innerText = `$${totalPrice}`;
+                
+                // Update CMC
+                const avgCMC = data.stats?.avgManaValue?.toFixed(2) || '2.53';
+                document.getElementById('deck-cmc').innerText = avgCMC;
+
+                // Update Mana Curve
+                const curveData = [
+                    data.manaCurve['1'] || 0,
+                    data.manaCurve['2'] || 0,
+                    data.manaCurve['3'] || 0,
+                    data.manaCurve['4'] || 0,
+                    data.manaCurve['5'] || 0,
+                    (data.manaCurve['6'] || 0) + (data.manaCurve['7'] || 0) + (data.manaCurve['8'] || 0)
+                ];
+                
+                myChart.data.datasets[0].data = curveData;
+                myChart.update();
+
+            } catch (e) {
+                console.error("Machine Spirit failure:", e);
+                document.getElementById('deck-price').innerText = 'OFFLINE';
+            }
+        }
+        
+        getMoxfieldData();
+    </script>
 </body>
 </html>
