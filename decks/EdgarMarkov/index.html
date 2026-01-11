@@ -25,7 +25,7 @@
 
     <div class="header">
         <div>USER: GHOSTROOT<br><span style="font-size: 1.4rem; font-weight: bold;">[ EDGAR_MARKOV ]</span></div>
-        <div class="status-blink" id="sync-status">● SEARCHING...</div>
+        <div class="status-blink" id="sync-status">● INITIALIZING...</div>
     </div>
 
     <div class="panel">
@@ -55,9 +55,9 @@
     <a href="https://www.moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">ACCESS FULL ARCHIVE</a>
 
     <script>
-        const deckId = '32hrkfk7C0qOt-B59XEfXQ';
+        const deckId = '32hrkfk7C0qOt-B59XEfXQ'; // Correct mixed-case ID
         
-        // Initialize Chart
+        // Setup Chart
         const ctx = document.getElementById('manaCurve').getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'bar',
@@ -69,25 +69,27 @@
         });
 
         async function getMoxfieldData() {
-            // Using a public proxy to bypass CORS blocks
+            // New Proxy: AllOrigins Raw
             const proxy = 'https://api.allorigins.win/raw?url='; 
-            const url = `${proxy}${encodeURIComponent(`https://api2.moxfield.com/v2/decks/all/${deckId}`)}`;
+            const target = `https://api2.moxfield.com/v2/decks/all/${deckId}`;
+            const url = `${proxy}${encodeURIComponent(target)}`;
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Proxy rejection');
+                if (!response.ok) throw new Error('Proxy error');
                 const data = await response.json();
 
-                // Map data to UI
+                // Mapping
                 document.getElementById('deck-price').innerText = `$${data.totals.usd.toFixed(2)}`;
                 document.getElementById('deck-cmc').innerText = data.stats.avgManaValue.toFixed(2);
                 document.getElementById('sync-status').innerText = '● LIVE_FEED';
                 document.getElementById('sync-status').style.color = '#00f2ff';
 
-                const curve = [data.manaCurve[1]||0, data.manaCurve[2]||0, data.manaCurve[3]||0, data.manaCurve[4]||0, data.manaCurve[5]||0, (data.manaCurve[6]||0)+(data.manaCurve[7]||0)];
+                const curve = [data.manaCurve[1]||0, data.manaCurve[2]||0, data.manaCurve[3]||0, data.manaCurve[4]||0, data.manaCurve[5]||0, (data.manaCurve[6]||0)+(data.manaCurve[7]||0)+(data.manaCurve[8]||0)];
                 myChart.data.datasets[0].data = curve;
                 myChart.update();
             } catch (e) {
+                console.error("Machine Spirit Error:", e);
                 document.getElementById('deck-price').innerText = 'OFFLINE';
                 document.getElementById('sync-status').innerText = '● SYNC_ERROR';
             }
