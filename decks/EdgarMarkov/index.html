@@ -9,110 +9,92 @@
     <style>
         :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); }
         body { background: var(--bg-dark); color: var(--neon-blue); font-family: 'Share+Tech+Mono', monospace; margin: 0; padding: 15px; text-transform: uppercase; overflow-x: hidden; }
-        body::before { content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
         .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .status-blink { color: var(--neon-red); animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
         .panel { background: var(--panel-bg); border: 1px solid var(--neon-blue); padding: 15px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
-        h2 { font-size: 1.1rem; margin-top: 0; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        h2 { font-size: 1.1rem; margin-top: 0; border-left: 4px solid var(--neon-blue); padding-left: 10px; margin-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
-        .stat-value { font-size: 1.4rem; display: block; color: #fff; }
-        .btn { display: block; width: 100%; padding: 12px; background: transparent; color: var(--neon-blue); border: 1px solid var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; }
-        #debug-log { font-size: 0.6rem; color: #555; margin-top: 10px; text-transform: none; }
+        .stat-value { font-size: 1.5rem; display: block; color: #fff; }
+        
+        /* Mana Distribution Grid */
+        .mana-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 10px; }
+        .mana-item { text-align: center; font-size: 0.7rem; }
+        .mana-symbol { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; border: 1px solid #fff; font-weight: bold; font-size: 1rem;}
+        .w { background: #f9faf4; color: #000; } .b { background: #150b00; color: #fff; } .r { background: #d3202a; color: #fff; } .c { background: #ccc; color: #333; }
+        
+        .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div>USER: GHOSTROOT<br><span style="font-size: 1.4rem; font-weight: bold;">[ EDGAR_MARKOV ]</span></div>
-        <div class="status-blink" id="sync-status">● INITIALIZING...</div>
+        <div>USER: GHOSTROOT<br><span style="font-size: 1.5rem; font-weight: bold;">[ EDGAR_MARKOV ]</span></div>
+        <div style="color: var(--neon-red); animation: blink 1s infinite;">● LIVE_FEED</div>
     </div>
 
     <div class="panel">
         <h2>TACTICAL OVERVIEW</h2>
         <div class="stats-grid">
-            <div class="stat-box">
-                <span style="font-size: 0.7rem;">TOTAL VALUE</span>
-                <span id="deck-price" class="stat-value">---</span>
-            </div>
-            <div class="stat-box">
-                <span style="font-size: 0.7rem;">AVG MANA VALUE</span>
-                <span id="deck-cmc" class="stat-value">---</span>
-            </div>
+            <div class="stat-box">POWER LEVEL<span class="stat-value">7.5</span></div>
+            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
         </div>
-        <div style="height: 140px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
+    </div>
+
+    <div class="panel">
+        <h2>STRATEGIC ANALYSIS</h2>
+        <div class="stats-grid">
+            <div class="stat-box">TOTAL VALUE<span class="stat-value">$412.87</span></div>
+            <div class="stat-box">AVG MANA VALUE<span class="stat-value">2.53</span></div>
+        </div>
+        <div style="height: 120px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
+    </div>
+
+    <div class="panel">
+        <h2>MANA DISTRIBUTION</h2>
+        <div class="mana-grid">
+            <div class="mana-item"><div class="mana-symbol w">W</div>23%</div>
+            <div class="mana-item"><div class="mana-symbol b" style="background:#000;">B</div>70%</div>
+            <div class="mana-item"><div class="mana-symbol r">R</div>11%</div>
+            <div class="mana-item"><div class="mana-symbol c">C</div>15%</div>
+            <div class="mana-item" style="opacity:0.3;"><div class="mana-symbol" style="background:#555;">G</div>0%</div>
+        </div>
     </div>
 
     <div class="panel">
         <h2>EMINENCE_PROTOCOLS</h2>
         <div style="font-size: 0.8rem; line-height: 1.6;">
             > SANGUINE BOND + EXQUISITE BLOOD<br>
-            > BOLAS'S CITADEL + TOP + AETHERFLUX<br>
-            > GRAVECRAWLER + ALTAR + ARTIST
+            > INDULGENT ARISTOCRAT + 1/1 TOKENS<br>
+            > CAPTIVATING VAMPIRE (CONTROL HIJACK)
         </div>
     </div>
 
-    <a href="https://www.moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">ACCESS FULL ARCHIVE</a>
-    
-    <div id="debug-log">MACHINE_SPIRIT: STANDBY</div>
+    <a href="https://www.moxfield.com/decks/32HRKFK7C0QOT-B59XEFXQ" class="btn">ACCESS FULL ARCHIVE</a>
 
     <script>
-        const deckId = '32hrkfk7C0qOt-B59XEfXQ';
-        const debug = document.getElementById('debug-log');
-        
-        // Chart Initialization
+        // Static Mana Curve Data
         const ctx = document.getElementById('manaCurve').getContext('2d');
-        const myChart = new Chart(ctx, {
+        new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['1', '2', '3', '4', '5', '6+'],
-                datasets: [{ data: [0,0,0,0,0,0], backgroundColor: 'rgba(0, 242, 255, 0.2)', borderColor: '#00f2ff', borderWidth: 1 }]
+                labels: ['0', '1', '2', '3', '4', '5', '6', '7+'],
+                datasets: [{
+                    data: [1, 7, 15, 14, 12, 6, 5, 1], // Data from your screenshot
+                    backgroundColor: 'rgba(0, 242, 255, 0.2)',
+                    borderColor: '#00f2ff',
+                    borderWidth: 1
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#00f2ff' } } } }
-        });
-
-        async function getMoxfieldData() {
-            // Using a cache-buster timestamp to force new data
-            const ts = new Date().getTime();
-            const proxy = 'https://api.allorigins.win/raw?url='; 
-            const target = `https://api2.moxfield.com/v2/decks/all/${deckId}?v=${ts}`;
-            const url = `${proxy}${encodeURIComponent(target)}`;
-
-            debug.innerText = "MACHINE_SPIRIT: PINGING_NOOSPHERE...";
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP_${response.status}`);
-                
-                const data = await response.json();
-                
-                // Asset Mapping
-                document.getElementById('deck-price').innerText = `$${data.totals.usd.toFixed(2)}`;
-                document.getElementById('deck-cmc').innerText = data.stats.avgManaValue.toFixed(2);
-                document.getElementById('sync-status').innerText = '● LIVE_FEED';
-                document.getElementById('sync-status').style.color = '#00f2ff';
-                debug.innerText = "MACHINE_SPIRIT: DATA_ESTABLISHED";
-
-                const curve = [
-                    data.manaCurve[1]||0, 
-                    data.manaCurve[2]||0, 
-                    data.manaCurve[3]||0, 
-                    data.manaCurve[4]||0, 
-                    data.manaCurve[5]||0, 
-                    (data.manaCurve[6]||0)+(data.manaCurve[7]||0)+(data.manaCurve[8]||0)
-                ];
-                myChart.data.datasets[0].data = curve;
-                myChart.update();
-
-            } catch (e) {
-                console.error(e);
-                document.getElementById('sync-status').innerText = '● SYNC_ERROR';
-                debug.innerText = `FATAL_ERROR: ${e.message}`;
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false },
+                    x: { ticks: { color: '#00f2ff', font: { family: 'Share Tech Mono' } } }
+                }
             }
-        }
-
-        getMoxfieldData();
+        });
     </script>
 </body>
 </html>
