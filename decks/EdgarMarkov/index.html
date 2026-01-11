@@ -7,94 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --neon-blue: #00f2ff;
-            --neon-red: #ff0055;
-            --bg-dark: #0a0b0d;
-            --panel-bg: rgba(20, 22, 26, 0.9);
-            --border: 1px solid var(--neon-blue);
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--neon-blue);
-            font-family: 'Share+Tech+Mono', monospace;
-            margin: 0;
-            padding: 15px;
-            text-transform: uppercase;
-            overflow-x: hidden;
-        }
-
-        /* Scanline Effect */
-        body::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-        }
-
-        .header {
-            border-bottom: 2px solid var(--neon-blue);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .status-blink {
-            color: var(--neon-red);
-            animation: blink 1s infinite;
-        }
-
+        :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); }
+        body { background: var(--bg-dark); color: var(--neon-blue); font-family: 'Share+Tech+Mono', monospace; margin: 0; padding: 15px; text-transform: uppercase; overflow-x: hidden; }
+        body::before { content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .status-blink { color: var(--neon-red); animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
-
-        .panel {
-            background: var(--panel-bg);
-            border: var(--border);
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
-        }
-
+        .panel { background: var(--panel-bg); border: 1px solid var(--neon-blue); padding: 15px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
         h2 { font-size: 1.2rem; margin-top: 0; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .stat-box {
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            padding: 8px;
-            text-align: center;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
         .stat-value { font-size: 1.5rem; display: block; color: #fff; }
-
-        .combo-list { list-style: none; padding: 0; font-size: 0.9rem; }
-        .combo-list li { margin-bottom: 8px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            color: var(--neon-blue);
-            border: 1px solid var(--neon-blue);
-            text-align: center;
-            text-decoration: none;
-            margin-top: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
+        .btn { display: block; width: 100%; padding: 12px; background: transparent; color: var(--neon-blue); border: 1px solid var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; cursor: pointer; transition: 0.3s; }
         .btn:hover { background: var(--neon-blue); color: var(--bg-dark); }
     </style>
 </head>
@@ -116,44 +40,25 @@
                 <span id="deck-price" class="stat-value">SCANNING...</span>
             </div>
             <div class="stat-box">
-                <span style="font-size: 0.7rem;">WIN RATE</span>
-                <span class="stat-value">34%</span>
+                <span style="font-size: 0.7rem;">AVG MANA VALUE</span>
+                <span id="deck-cmc" class="stat-value">---</span>
             </div>
         </div>
     </div>
 
     <div class="panel">
         <h2>STRATEGIC ANALYSIS</h2>
-        <div class="stats-grid">
-            <div class="stat-box">
-                <span style="font-size: 0.7rem;">POWER LEVEL</span>
-                <span class="stat-value">7.5</span>
-            </div>
-            <div class="stat-box">
-                <span style="font-size: 0.7rem;">AVG MANA VALUE</span>
-                <span id="deck-cmc" class="stat-value">2.53</span>
-            </div>
-        </div>
-        
-        <div style="margin-top: 15px; height: 120px;">
+        <div style="height: 150px;">
             <canvas id="manaCurve"></canvas>
         </div>
     </div>
 
     <div class="panel">
         <h2>COMBO TRIGGERS</h2>
-        <ul class="combo-list">
-            <li>> Sanguine Bond + Exquisite Blood</li>
-            <li>> Bolas's Citadel + Top + Aetherflux</li>
-            <li>> Gravecrawler + Altar + Artist</li>
-        </ul>
-    </div>
-
-    <div class="panel">
-        <h2>THREAT ASSESSMENT</h2>
-        <div style="font-size: 0.8rem; color: #aaa;">
-            WEAK TO: Graveyard Hate, Fast Aggro<br>
-            PRIORITY: Protect Combo Pieces
+        <div style="font-size: 0.8rem; line-height: 1.5;">
+            > SANGUINE BOND + EXQUISITE BLOOD<br>
+            > BOLAS'S CITADEL + TOP + AETHERFLUX<br>
+            > GRAVECRAWLER + ALTAR + ARTIST
         </div>
     </div>
 
@@ -164,70 +69,4 @@
     </div>
 
     <script>
-        const deckId = '32hrkfk7C0qOt-B59XEfXQ'; 
-        
-        // Initialize Chart first
-        const ctx = document.getElementById('manaCurve').getContext('2d');
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['1', '2', '3', '4', '5', '6+'],
-                datasets: [{
-                    label: 'MANA CURVE',
-                    data: [0, 0, 0, 0, 0, 0],
-                    backgroundColor: 'rgba(0, 242, 255, 0.2)',
-                    borderColor: '#00f2ff',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { display: false },
-                    x: { ticks: { color: '#00f2ff', font: { family: 'Share Tech Mono' } } }
-                }
-            }
-        });
-
-        async function getMoxfieldData() {
-            // Using a public CORS proxy to bypass security blocks
-            const proxy = 'https://corsproxy.io/?'; 
-            const apiUrl = `${proxy}https://api2.moxfield.com/v2/decks/all/${deckId}`;
-
-            try {
-                const response = await fetch(apiUrl); //
-                const data = await response.json(); //
-
-                // Update Total Deck Price
-                const totalPrice = data.totals?.usd?.toFixed(2) || '0.00';
-                document.getElementById('deck-price').innerText = `$${totalPrice}`;
-                
-                // Update CMC
-                const avgCMC = data.stats?.avgManaValue?.toFixed(2) || '2.53';
-                document.getElementById('deck-cmc').innerText = avgCMC;
-
-                // Update Mana Curve
-                const curveData = [
-                    data.manaCurve['1'] || 0,
-                    data.manaCurve['2'] || 0,
-                    data.manaCurve['3'] || 0,
-                    data.manaCurve['4'] || 0,
-                    data.manaCurve['5'] || 0,
-                    (data.manaCurve['6'] || 0) + (data.manaCurve['7'] || 0) + (data.manaCurve['8'] || 0)
-                ];
-                
-                myChart.data.datasets[0].data = curveData;
-                myChart.update();
-
-            } catch (e) {
-                console.error("Machine Spirit failure:", e);
-                document.getElementById('deck-price').innerText = 'OFFLINE';
-            }
-        }
-        
-        getMoxfieldData();
-    </script>
-</body>
-</html>
+        const deckId = '32hrkfk
