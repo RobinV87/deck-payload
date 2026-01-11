@@ -19,6 +19,7 @@
         .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
         .stat-value { font-size: 1.4rem; display: block; color: #fff; }
         .btn { display: block; width: 100%; padding: 12px; background: transparent; color: var(--neon-blue); border: 1px solid var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; }
+        #debug-log { font-size: 0.6rem; color: #555; margin-top: 10px; text-transform: none; }
     </style>
 </head>
 <body>
@@ -40,7 +41,7 @@
                 <span id="deck-cmc" class="stat-value">---</span>
             </div>
         </div>
-        <div style="height: 130px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
+        <div style="height: 140px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
     </div>
 
     <div class="panel">
@@ -53,11 +54,14 @@
     </div>
 
     <a href="https://www.moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">ACCESS FULL ARCHIVE</a>
+    
+    <div id="debug-log">MACHINE_SPIRIT: STANDBY</div>
 
     <script>
-        const deckId = '32hrkfk7C0qOt-B59XEfXQ'; // Correct mixed-case ID
+        const deckId = '32hrkfk7C0qOt-B59XEfXQ';
+        const debug = document.getElementById('debug-log');
         
-        // Setup Chart
+        // Chart Initialization
         const ctx = document.getElementById('manaCurve').getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'bar',
@@ -69,31 +73,45 @@
         });
 
         async function getMoxfieldData() {
-            // New Proxy: AllOrigins Raw
+            // Using a cache-buster timestamp to force new data
+            const ts = new Date().getTime();
             const proxy = 'https://api.allorigins.win/raw?url='; 
-            const target = `https://api2.moxfield.com/v2/decks/all/${deckId}`;
+            const target = `https://api2.moxfield.com/v2/decks/all/${deckId}?v=${ts}`;
             const url = `${proxy}${encodeURIComponent(target)}`;
+
+            debug.innerText = "MACHINE_SPIRIT: PINGING_NOOSPHERE...";
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Proxy error');
+                if (!response.ok) throw new Error(`HTTP_${response.status}`);
+                
                 const data = await response.json();
-
-                // Mapping
+                
+                // Asset Mapping
                 document.getElementById('deck-price').innerText = `$${data.totals.usd.toFixed(2)}`;
                 document.getElementById('deck-cmc').innerText = data.stats.avgManaValue.toFixed(2);
                 document.getElementById('sync-status').innerText = '● LIVE_FEED';
                 document.getElementById('sync-status').style.color = '#00f2ff';
+                debug.innerText = "MACHINE_SPIRIT: DATA_ESTABLISHED";
 
-                const curve = [data.manaCurve[1]||0, data.manaCurve[2]||0, data.manaCurve[3]||0, data.manaCurve[4]||0, data.manaCurve[5]||0, (data.manaCurve[6]||0)+(data.manaCurve[7]||0)+(data.manaCurve[8]||0)];
+                const curve = [
+                    data.manaCurve[1]||0, 
+                    data.manaCurve[2]||0, 
+                    data.manaCurve[3]||0, 
+                    data.manaCurve[4]||0, 
+                    data.manaCurve[5]||0, 
+                    (data.manaCurve[6]||0)+(data.manaCurve[7]||0)+(data.manaCurve[8]||0)
+                ];
                 myChart.data.datasets[0].data = curve;
                 myChart.update();
+
             } catch (e) {
-                console.error("Machine Spirit Error:", e);
-                document.getElementById('deck-price').innerText = 'OFFLINE';
+                console.error(e);
                 document.getElementById('sync-status').innerText = '● SYNC_ERROR';
+                debug.innerText = `FATAL_ERROR: ${e.message}`;
             }
         }
+
         getMoxfieldData();
     </script>
 </body>
