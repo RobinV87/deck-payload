@@ -142,34 +142,42 @@
     </div>
 </div>
 
-<script>
-const ctx = document.getElementById('manaCurve').getContext('2d');
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['1', '2', '3', '4', '5', '6+'],
-        datasets: [{
-            label: 'MANA CURVE',
-            data: [15, 22, 10, 5, 2, 1], // Replace with your Edgar's actual curve
-            backgroundColor: 'rgba(0, 242, 255, 0.2)',
-            borderColor: '#00f2ff',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            y: { display: false },
-            x: { 
-                grid: { display: false },
-                ticks: { color: '#00f2ff', font: { family: 'Share Tech Mono' } }
-            }
-        }
+// CONFIG: Replace with your actual Deck ID
+const deckId = '32hrkfk7C0qOt-B59XEfXQ'; 
+
+async function getMoxfieldData() {
+    try {
+        // Moxfield's public API endpoint
+        const response = await fetch(`https://api2.moxfield.com/v2/decks/all/${deckId}`);
+        const data = await response.json();
+
+        // 1. Update Total Deck Price (TCGPlayer Market)
+        // Moxfield stores total price in the 'totals' object
+        const totalPrice = data.totals?.usd?.toFixed(2) || '0.00';
+        document.getElementById('deck-price').innerText = `$${totalPrice}`;
+
+        // 2. Update Mana Curve Data dynamically
+        // Moxfield provides 'manaCurve' as an object
+        // We map it to our chart labels [1, 2, 3, 4, 5, 6+]
+        const curveData = [
+            data.manaCurve['1'] || 0,
+            data.manaCurve['2'] || 0,
+            data.manaCurve['3'] || 0,
+            data.manaCurve['4'] || 0,
+            data.manaCurve['5'] || 0,
+            (data.manaCurve['6'] || 0) + (data.manaCurve['7'] || 0) + (data.manaCurve['8'] || 0)
+        ];
+        
+        // Update the Chart.js instance (ensure myChart is globally accessible)
+        myChart.data.datasets[0].data = curveData;
+        myChart.update();
+
+    } catch (e) {
+        console.error("Machine Spirit failure:", e);
+        document.getElementById('deck-price').innerText = 'ENCRYPTED';
     }
-});
-</script>
+}
+getMoxfieldData();
 
     <div class="panel">
         <h2>COMBO TRIGGERS</h2>
