@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTROOT // EDGAR_MARKOV.SYS</title>
+    <title>GHOSTROOT // EDGAR_MARKOV.V6</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -11,90 +11,81 @@
         body { background: var(--bg-dark); color: var(--neon-blue); font-family: 'Share+Tech+Mono', monospace; margin: 0; padding: 15px; text-transform: uppercase; overflow-x: hidden; }
         .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .panel { background: var(--panel-bg); border: 1px solid var(--neon-blue); padding: 15px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
-        h2 { font-size: 1.1rem; margin-top: 0; border-left: 4px solid var(--neon-blue); padding-left: 10px; margin-bottom: 10px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        h2 { font-size: 1rem; margin: 0 0 10px; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
-        .stat-value { font-size: 1.5rem; display: block; color: #fff; }
+        .stat-value { font-size: 1.4rem; display: block; color: #fff; }
         
-        /* Mana Distribution Grid */
-        .mana-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 10px; }
-        .mana-item { text-align: center; font-size: 0.7rem; }
-        .mana-symbol { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; border: 1px solid #fff; font-weight: bold; font-size: 1rem;}
-        .w { background: #f9faf4; color: #000; } .b { background: #150b00; color: #fff; } .r { background: #d3202a; color: #fff; } .c { background: #ccc; color: #333; }
-        
-        .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; cursor: pointer; }
+        /* Token System */
+        .token-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
+        .token-btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); width: 28px; height: 28px; cursor: pointer; font-family: inherit; }
+        .token-btn:hover { background: var(--neon-blue); color: #000; }
+        .count-display { min-width: 30px; text-align: center; font-size: 1.2rem; color: #fff; }
+
+        .mana-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; text-align: center; font-size: 0.7rem; }
+        .mana-sym { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #fff; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .w { background: #f9faf4; color: #000; } .b { background: #000; color: #fff; } .r { background: #d3202a; color: #fff; } .c { background: #ccc; color: #333; }
+
+        .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div>USER: GHOSTROOT<br><span style="font-size: 1.5rem; font-weight: bold;">[ EDGAR_MARKOV ]</span></div>
-        <div style="color: var(--neon-red); animation: blink 1s infinite;">● LIVE_FEED</div>
+        <div>USER: GHOSTROOT<br><span style="font-size: 1.4rem; font-weight: bold;">[ EDGAR_MARKOV ]</span></div>
+        <div style="color: var(--neon-red); animation: blink 1s infinite;">● STANDALONE</div>
     </div>
 
     <div class="panel">
         <h2>TACTICAL OVERVIEW</h2>
         <div class="stats-grid">
-            <div class="stat-box">POWER LEVEL<span class="stat-value">7.5</span></div>
-            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
+            <div class="stat-box">COMMANDER BRACKET<span class="stat-value">4 (Optimized)</span></div>
+            <div class="stat-box">ASSET WORTH<span class="stat-value">150&euro;</span></div>
         </div>
     </div>
 
     <div class="panel">
         <h2>STRATEGIC ANALYSIS</h2>
         <div class="stats-grid">
-            <div class="stat-box">TOTAL VALUE<span class="stat-value">$412.87</span></div>
+            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
             <div class="stat-box">AVG MANA VALUE<span class="stat-value">2.53</span></div>
         </div>
         <div style="height: 120px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
     </div>
 
     <div class="panel">
-        <h2>MANA DISTRIBUTION</h2>
-        <div class="mana-grid">
-            <div class="mana-item"><div class="mana-symbol w">W</div>23%</div>
-            <div class="mana-item"><div class="mana-symbol b" style="background:#000;">B</div>70%</div>
-            <div class="mana-item"><div class="mana-symbol r">R</div>11%</div>
-            <div class="mana-item"><div class="mana-symbol c">C</div>15%</div>
-            <div class="mana-item" style="opacity:0.3;"><div class="mana-symbol" style="background:#555;">G</div>0%</div>
-        </div>
+        <h2>TOKEN_LOGISTICS</h2>
+        <div class="token-row"><span>VAMPIRE (1/1)</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('v',-1)">-</button><span id="v" class="count-display">0</span><button class="token-btn" onclick="upd('v',1)">+</button></div></div>
+        <div class="token-row"><span>BAT (1/1 FLY)</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('b',-1)">-</button><span id="b" class="count-display">0</span><button class="token-btn" onclick="upd('b',1)">+</button></div></div>
+        <div class="token-row"><span>TREASURE</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('t',-1)">-</button><span id="t" class="count-display">0</span><button class="token-btn" onclick="upd('t',1)">+</button></div></div>
+        <button onclick="rst()" class="btn" style="padding:5px; margin-top:10px; border-color:var(--neon-red); color:var(--neon-red);">PROTOCOL: BOARD_WIPE_RESET</button>
     </div>
 
     <div class="panel">
-        <h2>EMINENCE_PROTOCOLS</h2>
-        <div style="font-size: 0.8rem; line-height: 1.6;">
-            > SANGUINE BOND + EXQUISITE BLOOD<br>
-            > INDULGENT ARISTOCRAT + 1/1 TOKENS<br>
-            > CAPTIVATING VAMPIRE (CONTROL HIJACK)
+        <h2>MANA DISTRIBUTION</h2>
+        <div class="mana-grid">
+            <div><div class="mana-sym w">W</div>23%</div>
+            <div><div class="mana-sym b">B</div>70%</div>
+            <div><div class="mana-sym r">R</div>11%</div>
+            <div><div class="mana-sym c">C</div>15%</div>
         </div>
     </div>
 
-    <a href="https://www.moxfield.com/decks/32HRKFK7C0QOT-B59XEFXQ" class="btn">ACCESS FULL ARCHIVE</a>
+    <a href="https://moxfield.com/decks/32HRKFK7C0QOT-B59XEFXQ" class="btn">VIEW FULL MANIFEST (MOXFIELD)</a>
 
     <script>
-        // Static Mana Curve Data
-        const ctx = document.getElementById('manaCurve').getContext('2d');
-        new Chart(ctx, {
+        // Static Mana Curve
+        new Chart(document.getElementById('manaCurve'), {
             type: 'bar',
             data: {
                 labels: ['0', '1', '2', '3', '4', '5', '6', '7+'],
-                datasets: [{
-                    data: [1, 7, 15, 14, 12, 6, 5, 1], // Data from your screenshot
-                    backgroundColor: 'rgba(0, 242, 255, 0.2)',
-                    borderColor: '#00f2ff',
-                    borderWidth: 1
-                }]
+                datasets: [{ data: [1, 7, 15, 14, 12, 6, 5, 1], backgroundColor: 'rgba(0, 242, 255, 0.2)', borderColor: '#00f2ff', borderWidth: 1 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { display: false },
-                    x: { ticks: { color: '#00f2ff', font: { family: 'Share Tech Mono' } } }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#00f2ff' } } } }
         });
+
+        function upd(id, n) { let e=document.getElementById(id); e.innerText = Math.max(0, parseInt(e.innerText)+n); }
+        function rst() { ['v','b','t'].forEach(i => document.getElementById(i).innerText='0'); }
     </script>
 </body>
 </html>
