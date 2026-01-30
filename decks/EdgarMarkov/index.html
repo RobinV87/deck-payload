@@ -7,29 +7,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); --gold: #ffd700; }
+        :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); --gold-deep: #b8860b; }
         body { background: var(--bg-dark); color: var(--neon-blue); font-family: 'Share+Tech+Mono', monospace; margin: 0; padding: 15px; text-transform: uppercase; overflow-x: hidden; }
         .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .panel { background: var(--panel-bg); border: 1px solid var(--neon-blue); padding: 15px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
         h2 { font-size: 0.9rem; margin: 0 0 10px; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .cmd-damage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
         .stat-value { font-size: 1.4rem; display: block; color: #fff; }
         
-        /* Token & Tracker Logic */
         .token-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
         .token-btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); width: 28px; height: 28px; cursor: pointer; font-family: inherit; }
         .token-btn:hover { background: var(--neon-blue); color: #000; }
         .count-display { min-width: 30px; text-align: center; font-size: 1.2rem; color: #fff; }
 
-        /* Monarch / Blessing Toggles */
-        .toggle-active { border-color: var(--neon-red); box-shadow: inset 0 0 10px var(--neon-red); color: var(--neon-red) !important; }
-        .blessing-active { border-color: var(--gold); color: var(--gold) !important; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3); }
+        .toggle-active { border-color: var(--neon-red); box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.4); color: var(--neon-red) !important; }
+        .blessing-active { border-color: var(--gold-deep); color: var(--gold-deep) !important; box-shadow: inset 0 0 15px rgba(184, 134, 11, 0.4); }
 
         .mana-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; text-align: center; font-size: 0.7rem; }
         .mana-sym { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #fff; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .w { background: #f9faf4; color: #000; } .b { background: #000; color: #fff; } .r { background: #d3202a; color: #fff; } .c { background: #ccc; color: #333; }
-        .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.8rem; }
+        
+        .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.8rem; box-sizing: border-box; cursor: pointer; background: transparent; font-family: inherit; text-transform: uppercase;}
+        .btn:hover { background: rgba(0, 242, 255, 0.1); }
+        .btn-red { border-color: var(--neon-red); color: var(--neon-red); margin-top: 20px; }
+        .btn-red:hover { background: rgba(255, 0, 85, 0.1); }
     </style>
 </head>
 <body>
@@ -56,11 +59,45 @@
                     <button class="token-btn" onclick="upd('tax',1)">+</button>
                 </div>
             </div>
-            <div class="stat-box" id="monarch-box" onclick="toggleState('monarch-box', 'THE MONARCH')" style="cursor:pointer; transition: 0.3s;">
+            <div class="stat-box" id="monarch-box" onclick="toggleState('monarch-box', 'THE MONARCH')" style="cursor:pointer;">
                 STATUS
-                <span id="monarch-box-text" class="stat-value" style="font-size: 0.9rem; margin-top:8px;">NEUTRAL</span>
+                <span id="monarch-box-text" class="stat-value" style="font-size: 0.8rem; margin-top:8px;">NEUTRAL</span>
             </div>
         </div>
+        
+        <h2 style="margin-top:20px; border-color: var(--neon-red);">COMMANDER_DAMAGE</h2>
+        <div class="cmd-damage-grid">
+            <div class="stat-box">OPP_1<br>
+                <span id="cd1" class="stat-value">0</span>
+                <div style="display:flex; justify-content:center; gap:5px;">
+                    <button class="token-btn" onclick="upd('cd1',-1)">-</button>
+                    <button class="token-btn" onclick="upd('cd1',1)">+</button>
+                </div>
+            </div>
+            <div class="stat-box">OPP_2<br>
+                <span id="cd2" class="stat-value">0</span>
+                <div style="display:flex; justify-content:center; gap:5px;">
+                    <button class="token-btn" onclick="upd('cd1',-1)">-</button>
+                    <button class="token-btn" onclick="upd('cd2',1)">+</button>
+                </div>
+            </div>
+            <div class="stat-box">OPP_3<br>
+                <span id="cd3" class="stat-value">0</span>
+                <div style="display:flex; justify-content:center; gap:5px;">
+                    <button class="token-btn" onclick="upd('cd3',-1)">-</button>
+                    <button class="token-btn" onclick="upd('cd3',1)">+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>STRATEGIC_ANALYSIS</h2>
+        <div class="stats-grid">
+            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
+            <div class="stat-box">AVG MV<span class="stat-value">2.53</span></div>
+        </div>
+        <div style="height: 100px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
     </div>
 
     <div class="panel">
@@ -72,16 +109,20 @@
     </div>
 
     <div class="panel">
-        <h2>STRATEGIC ANALYSIS</h2>
-        <div class="stats-grid">
-            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
-            <div class="stat-box">AVG MV<span class="stat-value">2.53</span></div>
+        <h2>MANA_DISTRIBUTION</h2>
+        <div class="mana-grid">
+            <div><div class="mana-sym w">W</div>23%</div>
+            <div><div class="mana-sym b">B</div>70%</div>
+            <div><div class="mana-sym r">R</div>11%</div>
+            <div><div class="mana-sym c">C</div>15%</div>
         </div>
-        <div style="height: 100px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
     </div>
 
+    <a href="https://moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">VIEW FULL DECKLIST (MOXFIELD)</a>
+    
+    <button class="btn btn-red" onclick="resetAll()">[ SYSTEM_RESET ]</button>
+
     <script>
-        // Chart Config
         new Chart(document.getElementById('manaCurve'), {
             type: 'bar',
             data: {
@@ -91,7 +132,6 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#00f2ff' } } } }
         });
 
-        // Logic
         function upd(id, n) { 
             let e = document.getElementById(id); 
             e.innerText = Math.max(0, parseInt(e.innerText) + n); 
@@ -104,13 +144,28 @@
 
         function toggleState(id, label, activeClass = 'toggle-active') {
             let e = document.getElementById(id);
-            let textSpan = document.getElementById(id + '-text');
             e.classList.toggle(activeClass);
             
             if (id === 'blessing-btn') {
                 e.innerText = e.classList.contains(activeClass) ? `ASCEND: ${label}` : 'ASCEND: INACTIVE';
             } else {
                 document.getElementById(id + '-text').innerText = e.classList.contains(activeClass) ? 'ACTIVE' : 'NEUTRAL';
+            }
+        }
+
+        function resetAll() {
+            if(confirm("INITIALIZE RESET? ALL SESSION DATA WILL BE WIPED.")) {
+                document.getElementById('life-total').innerText = '40';
+                document.getElementById('tax').innerText = '0';
+                ['v','b','t','cd1','cd2','cd3'].forEach(i => document.getElementById(i).innerText = '0');
+                
+                let m = document.getElementById('monarch-box');
+                m.classList.remove('toggle-active');
+                document.getElementById('monarch-box-text').innerText = 'NEUTRAL';
+                
+                let bl = document.getElementById('blessing-btn');
+                bl.classList.remove('blessing-active');
+                bl.innerText = 'ASCEND: INACTIVE';
             }
         }
     </script>
