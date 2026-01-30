@@ -7,25 +7,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); }
+        :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); --gold: #ffd700; }
         body { background: var(--bg-dark); color: var(--neon-blue); font-family: 'Share+Tech+Mono', monospace; margin: 0; padding: 15px; text-transform: uppercase; overflow-x: hidden; }
         .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .panel { background: var(--panel-bg); border: 1px solid var(--neon-blue); padding: 15px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
-        h2 { font-size: 1rem; margin: 0 0 10px; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
+        h2 { font-size: 0.9rem; margin: 0 0 10px; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
         .stat-value { font-size: 1.4rem; display: block; color: #fff; }
         
-        /* Token System */
+        /* Token & Tracker Logic */
         .token-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
         .token-btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); width: 28px; height: 28px; cursor: pointer; font-family: inherit; }
         .token-btn:hover { background: var(--neon-blue); color: #000; }
         .count-display { min-width: 30px; text-align: center; font-size: 1.2rem; color: #fff; }
 
+        /* Monarch / Blessing Toggles */
+        .toggle-active { border-color: var(--neon-red); box-shadow: inset 0 0 10px var(--neon-red); color: var(--neon-red) !important; }
+        .blessing-active { border-color: var(--gold); color: var(--gold) !important; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3); }
+
         .mana-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; text-align: center; font-size: 0.7rem; }
         .mana-sym { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #fff; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .w { background: #f9faf4; color: #000; } .b { background: #000; color: #fff; } .r { background: #d3202a; color: #fff; } .c { background: #ccc; color: #333; }
-
         .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.8rem; }
     </style>
 </head>
@@ -37,43 +40,48 @@
     </div>
 
     <div class="panel">
-        <h2>TACTICAL OVERVIEW</h2>
-        <div class="stats-grid">
-            <div class="stat-box">COMMANDER BRACKET<span class="stat-value">4</span></div>
-            <div class="stat-box">ASSET WORTH<span class="stat-value">150&euro;</span></div>
+        <h2>VITAL_SIGNS</h2>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                <button class="token-btn" style="width: 45px; height: 45px; font-size: 1.5rem;" onclick="updLife(-1)">-</button>
+                <span id="life-total" style="font-size: 3.5rem; font-weight: bold; color: #fff;">40</span>
+                <button class="token-btn" style="width: 45px; height: 45px; font-size: 1.5rem;" onclick="updLife(1)">+</button>
+            </div>
         </div>
-    </div>
-
-    <div class="panel">
-        <h2>STRATEGIC ANALYSIS</h2>
         <div class="stats-grid">
-            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
-            <div class="stat-box">AVG MANA VALUE<span class="stat-value">2.53</span></div>
+            <div class="stat-box">COMMAND TAX
+                <div style="display:flex; justify-content:center; gap:10px; margin-top:5px;">
+                    <button class="token-btn" onclick="upd('tax',-1)">-</button>
+                    <span id="tax" class="stat-value">0</span>
+                    <button class="token-btn" onclick="upd('tax',1)">+</button>
+                </div>
+            </div>
+            <div class="stat-box" id="monarch-box" onclick="toggleState('monarch-box', 'THE MONARCH')" style="cursor:pointer; transition: 0.3s;">
+                STATUS
+                <span id="monarch-box-text" class="stat-value" style="font-size: 0.9rem; margin-top:8px;">NEUTRAL</span>
+            </div>
         </div>
-        <div style="height: 120px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
     </div>
 
     <div class="panel">
         <h2>TOKEN_LOGISTICS</h2>
         <div class="token-row"><span>VAMPIRE (1/1)</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('v',-1)">-</button><span id="v" class="count-display">0</span><button class="token-btn" onclick="upd('v',1)">+</button></div></div>
         <div class="token-row"><span>BAT (1/1 FLY)</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('b',-1)">-</button><span id="b" class="count-display">0</span><button class="token-btn" onclick="upd('b',1)">+</button></div></div>
-        <div class="token-row"><span>TREASURE</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('t',-1)">-</button><span id="t" class="count-display">0</span><button class="token-btn" onclick="upd('t',1)">+</button></div></div>
+        <div class="token-row"><span>BLOOD / TREASURE</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('t',-1)">-</button><span id="t" class="count-display">0</span><button class="token-btn" onclick="upd('t',1)">+</button></div></div>
+        <button class="btn" id="blessing-btn" onclick="toggleState('blessing-btn', 'CITY\'S BLESSING', 'blessing-active')" style="margin-top:15px; border-style: dashed;">ASCEND: INACTIVE</button>
     </div>
 
     <div class="panel">
-        <h2>MANA DISTRIBUTION</h2>
-        <div class="mana-grid">
-            <div><div class="mana-sym w">W</div>23%</div>
-            <div><div class="mana-sym b">B</div>70%</div>
-            <div><div class="mana-sym r">R</div>11%</div>
-            <div><div class="mana-sym c">C</div>15%</div>
+        <h2>STRATEGIC ANALYSIS</h2>
+        <div class="stats-grid">
+            <div class="stat-box">WIN RATE<span class="stat-value">34%</span></div>
+            <div class="stat-box">AVG MV<span class="stat-value">2.53</span></div>
         </div>
+        <div style="height: 100px; margin-top: 15px;"><canvas id="manaCurve"></canvas></div>
     </div>
 
-    <a href="https://moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">VIEW FULL DECKLIST (MOXFIELD)</a>
-
     <script>
-        // Static Mana Curve
+        // Chart Config
         new Chart(document.getElementById('manaCurve'), {
             type: 'bar',
             data: {
@@ -83,8 +91,28 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#00f2ff' } } } }
         });
 
-        function upd(id, n) { let e=document.getElementById(id); e.innerText = Math.max(0, parseInt(e.innerText)+n); }
-        function rst() { ['v','b','t'].forEach(i => document.getElementById(i).innerText='0'); }
+        // Logic
+        function upd(id, n) { 
+            let e = document.getElementById(id); 
+            e.innerText = Math.max(0, parseInt(e.innerText) + n); 
+        }
+
+        function updLife(n) {
+            let e = document.getElementById('life-total');
+            e.innerText = parseInt(e.innerText) + n;
+        }
+
+        function toggleState(id, label, activeClass = 'toggle-active') {
+            let e = document.getElementById(id);
+            let textSpan = document.getElementById(id + '-text');
+            e.classList.toggle(activeClass);
+            
+            if (id === 'blessing-btn') {
+                e.innerText = e.classList.contains(activeClass) ? `ASCEND: ${label}` : 'ASCEND: INACTIVE';
+            } else {
+                document.getElementById(id + '-text').innerText = e.classList.contains(activeClass) ? 'ACTIVE' : 'NEUTRAL';
+            }
+        }
     </script>
 </body>
 </html>
