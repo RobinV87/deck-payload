@@ -3,163 +3,1042 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTROOT // EDGAR_MARKOV.V8</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>Castle Markov — Edgar, Patriarch of Blood</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon-blue: #00f2ff; --neon-red: #ff0055; --bg-dark: #0a0b0d; --panel-bg: rgba(20, 22, 26, 0.9); --gold-deep: #b8860b; --neon-purple: #bc13fe; }
-        body { background: var(--bg-dark); color: var(--neon-blue); font-family: 'Share+Tech+Mono', monospace; margin: 0; padding: 15px; text-transform: uppercase; overflow-x: hidden; }
-        .header { border-bottom: 2px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .panel { background: var(--panel-bg); border: 1px solid var(--neon-blue); padding: 15px; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
-        h2 { font-size: 0.9rem; margin: 0 0 10px; border-left: 4px solid var(--neon-blue); padding-left: 10px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .cmd-damage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .stat-box { border: 1px solid rgba(0, 242, 255, 0.3); padding: 8px; text-align: center; }
-        .stat-value { font-size: 1.4rem; display: block; color: #fff; }
-        .token-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 4px; border-bottom: 1px solid rgba(0, 242, 255, 0.1); }
-        .token-btn { background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); width: 28px; height: 28px; cursor: pointer; font-family: inherit; }
-        .token-btn:hover { background: var(--neon-blue); color: #000; }
-        .count-display { min-width: 30px; text-align: center; font-size: 1.2rem; color: #fff; }
-        
-        /* Toggles */
-        .toggle-active { border-color: var(--neon-red); box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.4); color: var(--neon-red) !important; }
-        .blessing-active { border-color: var(--gold-deep); color: var(--gold-deep) !important; box-shadow: inset 0 0 15px rgba(184, 134, 11, 0.4); }
-        .wincon-active { border-color: var(--neon-purple); color: var(--neon-purple) !important; box-shadow: inset 0 0 15px rgba(188, 19, 254, 0.3); }
+        :root {
+            --blood: #8b1a1a;
+            --blood-bright: #c0392b;
+            --blood-deep: #4a0e0e;
+            --blood-glow: rgba(139, 26, 26, 0.4);
+            --gold: #c9a84c;
+            --gold-dim: rgba(201, 168, 76, 0.3);
+            --gold-bright: #e8c952;
+            --stone: #1a1714;
+            --stone-light: #2a2520;
+            --stone-border: rgba(201, 168, 76, 0.15);
+            --parchment: #d4c5a0;
+            --parchment-dim: rgba(212, 197, 160, 0.5);
+            --text-main: #c4b898;
+            --text-dim: rgba(196, 184, 152, 0.4);
+            --text-bright: #e8dcc4;
+            --candle: #e8a926;
+            --candle-glow: rgba(232, 169, 38, 0.08);
+            --glass-red: rgba(180, 30, 30, 0.15);
+            --glass-blue: rgba(40, 60, 140, 0.1);
+            --glass-purple: rgba(100, 40, 120, 0.12);
+        }
 
-        .mana-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; text-align: center; font-size: 0.7rem; }
-        .mana-sym { width: 25px; height: 25px; border-radius: 50%; border: 1px solid #fff; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .w { background: #f9faf4; color: #000; } .b { background: #000; color: #fff; } .r { background: #d3202a; color: #fff; } .c { background: #ccc; color: #333; }
-        .btn { display: block; width: 100%; padding: 12px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-align: center; text-decoration: none; margin-top: 10px; font-size: 0.8rem; box-sizing: border-box; cursor: pointer; background: transparent; font-family: inherit; text-transform: uppercase;}
-        .btn-red { border-color: var(--neon-red); color: var(--neon-red); margin-top: 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--stone);
+            color: var(--text-main);
+            font-family: 'Cormorant Garamond', serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Stone texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(0,0,0,0.03) 3px,
+                    rgba(0,0,0,0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 5px,
+                    rgba(0,0,0,0.02) 5px,
+                    rgba(0,0,0,0.02) 6px
+                );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Candlelight ambient glow at top */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, var(--candle-glow) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: candleFlicker 4s ease-in-out infinite;
+        }
+
+        @keyframes candleFlicker {
+            0%, 100% { opacity: 0.7; }
+            25% { opacity: 0.9; }
+            50% { opacity: 0.6; }
+            75% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 16px 12px;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*              HEADER                     */
+        /* ═══════════════════════════════════════ */
+        .header {
+            text-align: center;
+            padding: 28px 16px 22px;
+            margin-bottom: 16px;
+            position: relative;
+            border: 1px solid var(--stone-border);
+            background:
+                linear-gradient(180deg, rgba(74, 14, 14, 0.12) 0%, transparent 60%),
+                var(--stone);
+        }
+
+        /* Gothic arch top decoration */
+        .header::before {
+            content: '⟡';
+            position: absolute;
+            top: -1px; left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            background: var(--stone);
+            color: var(--gold);
+            font-size: 0.9rem;
+            padding: 0 12px;
+            letter-spacing: 6px;
+        }
+
+        .header-cross {
+            font-size: 0.7rem;
+            color: var(--gold-dim);
+            letter-spacing: 8px;
+            margin-bottom: 8px;
+        }
+
+        .header-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: 4px;
+            line-height: 1.2;
+            text-shadow: 0 0 30px var(--blood-glow), 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            letter-spacing: 3px;
+            margin-top: 6px;
+        }
+
+        .header-rule {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+            margin: 12px auto 0;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            margin-top: 10px;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*              PANELS                     */
+        /* ═══════════════════════════════════════ */
+        .panel {
+            background:
+                linear-gradient(180deg, rgba(42, 37, 32, 0.5) 0%, var(--stone) 100%);
+            border: 1px solid var(--stone-border);
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .panel-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.55rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .panel-label::before,
+        .panel-label::after {
+            content: '—';
+            margin: 0 8px;
+            color: var(--gold-dim);
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*            LIFE TOTAL                   */
+        /* ═══════════════════════════════════════ */
+        .life-section { text-align: center; padding: 6px 0 10px; }
+
+        .life-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .life-value {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 4.2rem;
+            font-weight: 900;
+            color: var(--text-bright);
+            min-width: 110px;
+            text-shadow: 0 0 40px var(--candle-glow), 0 2px 8px rgba(0,0,0,0.6);
+            line-height: 1;
+            transition: color 0.4s, text-shadow 0.4s;
+        }
+
+        .life-value.danger {
+            color: var(--blood-bright);
+            text-shadow: 0 0 30px var(--blood-glow);
+        }
+
+        .life-value.critical {
+            color: var(--blood-bright);
+            text-shadow: 0 0 40px var(--blood);
+            animation: bloodPulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes bloodPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .life-inscription {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 4px;
+            margin-top: 8px;
+        }
+
+        /* Shared button style — stone tablet feel */
+        .stone-btn {
+            background: linear-gradient(180deg, var(--stone-light), var(--stone));
+            border: 1px solid var(--stone-border);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stone-btn:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-dim);
+        }
+
+        .stone-btn:active {
+            transform: scale(0.95);
+            background: var(--stone);
+        }
+
+        .sm-stone-btn {
+            background: linear-gradient(180deg, var(--stone-light), var(--stone));
+            border: 1px solid var(--stone-border);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sm-stone-btn:hover { border-color: var(--gold); }
+        .sm-stone-btn:active { transform: scale(0.92); }
+
+        /* ═══════════════════════════════════════ */
+        /*          STATS ROW                      */
+        /* ═══════════════════════════════════════ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .stat-cell {
+            border: 1px solid var(--stone-border);
+            padding: 12px 8px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .stat-cell-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .stat-cell-value {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-bright);
+        }
+
+        .stat-cell-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*         TOGGLE CELLS                    */
+        /* ═══════════════════════════════════════ */
+        .toggle-cell {
+            border: 1px solid var(--stone-border);
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.35s;
+            user-select: none;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .toggle-cell:active { transform: scale(0.97); }
+
+        .toggle-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .toggle-status {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-top: 6px;
+            color: var(--text-dim);
+            transition: color 0.3s;
+            letter-spacing: 1px;
+        }
+
+        /* Monarch — golden crown glow */
+        .is-monarch {
+            border-color: var(--gold) !important;
+            background: linear-gradient(180deg, rgba(201, 168, 76, 0.08) 0%, rgba(0,0,0,0.2) 100%) !important;
+            box-shadow: inset 0 0 25px rgba(201, 168, 76, 0.08), 0 0 10px rgba(201, 168, 76, 0.05);
+        }
+        .is-monarch .toggle-label { color: var(--gold) !important; }
+        .is-monarch .toggle-status { color: var(--gold-bright) !important; font-weight: 600; }
+
+        /* Wincon — stained glass purple */
+        .is-wincon {
+            border-color: rgba(140, 60, 180, 0.5) !important;
+            background: linear-gradient(180deg, var(--glass-purple) 0%, rgba(0,0,0,0.2) 100%) !important;
+            box-shadow: inset 0 0 25px rgba(100, 40, 120, 0.1);
+        }
+        .is-wincon .toggle-label { color: rgba(180, 120, 220, 0.8) !important; }
+        .is-wincon .toggle-status { color: rgba(200, 150, 240, 0.9) !important; font-weight: 600; }
+
+        /* Drain — blood red */
+        .is-drain {
+            border-color: var(--blood) !important;
+            background: linear-gradient(180deg, var(--glass-red) 0%, rgba(0,0,0,0.2) 100%) !important;
+            box-shadow: inset 0 0 25px rgba(139, 26, 26, 0.12);
+        }
+        .is-drain .toggle-label { color: var(--blood-bright) !important; }
+        .is-drain .toggle-status { color: var(--blood-bright) !important; font-weight: 600; }
+
+        /* Blessing — ancient gold */
+        .is-blessing {
+            border-color: var(--gold) !important;
+            background: linear-gradient(180deg, rgba(201, 168, 76, 0.06) 0%, rgba(0,0,0,0.2) 100%) !important;
+        }
+        .is-blessing .toggle-label { color: var(--gold) !important; }
+        .is-blessing .toggle-status { color: var(--gold) !important; }
+
+        /* ═══════════════════════════════════════ */
+        /*        WINCON GRID                      */
+        /* ═══════════════════════════════════════ */
+        .wincon-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .wincon-full { grid-column: 1 / -1; }
+
+        /* Stained glass decorative top border */
+        .panel-stained {
+            border-top: 2px solid transparent;
+            border-image: linear-gradient(90deg, 
+                transparent 5%, 
+                var(--blood) 20%, 
+                rgba(100, 40, 120, 0.5) 35%,
+                rgba(40, 60, 140, 0.4) 50%,
+                rgba(100, 40, 120, 0.5) 65%,
+                var(--blood) 80%, 
+                transparent 95%
+            ) 1;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*       COMMANDER DAMAGE                  */
+        /* ═══════════════════════════════════════ */
+        .cmd-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .cmd-cell {
+            border: 1px solid var(--stone-border);
+            padding: 12px 6px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            transition: all 0.35s;
+        }
+
+        .cmd-cell-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.45rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .cmd-cell-value {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin: 4px 0;
+            transition: color 0.35s;
+        }
+
+        .cmd-cell-controls {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .cmd-progress {
+            height: 2px;
+            background: rgba(201, 168, 76, 0.1);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .cmd-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            transition: width 0.4s, background 0.4s;
+        }
+
+        /* Lethal state — blood seeps in */
+        .cmd-lethal {
+            border-color: var(--blood) !important;
+            background: linear-gradient(180deg, var(--glass-red), rgba(0,0,0,0.2)) !important;
+            box-shadow: inset 0 0 20px rgba(139, 26, 26, 0.15);
+        }
+        .cmd-lethal .cmd-cell-value { color: var(--blood-bright); }
+        .cmd-lethal .cmd-cell-label { color: var(--blood-bright); }
+        .cmd-lethal .cmd-progress-bar { background: var(--blood-bright); }
+
+        /* ═══════════════════════════════════════ */
+        /*        TOKEN LOGISTICS                  */
+        /* ═══════════════════════════════════════ */
+        .token-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 4px;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.06);
+        }
+
+        .token-row:last-of-type { border-bottom: none; }
+
+        .token-name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: 2px;
+        }
+
+        .token-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+        }
+
+        .token-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .token-value {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            min-width: 28px;
+            text-align: center;
+        }
+
+        /* Ascend button */
+        .ascend-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px dashed var(--stone-border);
+            color: var(--text-dim);
+            background: transparent;
+            font-family: 'Cinzel', serif;
+            font-size: 0.55rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 14px;
+        }
+
+        .ascend-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+        .ascend-btn.is-blessing {
+            border-style: solid;
+            border-color: var(--gold);
+            color: var(--gold);
+            background: linear-gradient(180deg, rgba(201, 168, 76, 0.05), transparent);
+            box-shadow: inset 0 0 15px rgba(201, 168, 76, 0.06);
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*        MANA ANALYSIS                    */
+        /* ═══════════════════════════════════════ */
+        .chart-wrap {
+            height: 80px;
+            margin-bottom: 14px;
+        }
+
+        .mana-pips {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            text-align: center;
+        }
+
+        .mana-pip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mana-circle {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 0.5rem;
+            font-weight: 700;
+        }
+
+        .mana-w { background: #e8e0c8; color: #5a4e3a; border: 1px solid rgba(201, 168, 76, 0.3); }
+        .mana-b { background: #1a1616; color: #888; border: 1px solid rgba(255,255,255,0.15); }
+        .mana-r { background: var(--blood-deep); color: #c88; border: 1px solid var(--blood); }
+        .mana-c { background: #3a3530; color: #999; border: 1px solid rgba(255,255,255,0.1); }
+
+        .mana-pct {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*        ACTION BUTTONS                   */
+        /* ═══════════════════════════════════════ */
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--stone-border);
+            color: var(--gold);
+            background: linear-gradient(180deg, var(--stone-light), var(--stone));
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .action-btn:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold-dim);
+        }
+
+        .action-btn-blood {
+            border-color: rgba(139, 26, 26, 0.3);
+            color: var(--blood-bright);
+            margin-top: 16px;
+        }
+
+        .action-btn-blood:hover {
+            border-color: var(--blood);
+            box-shadow: 0 0 15px var(--blood-glow);
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*         FOOTER                          */
+        /* ═══════════════════════════════════════ */
+        .footer {
+            text-align: center;
+            padding: 16px 0 24px;
+        }
+
+        .footer-rule {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+            margin: 0 auto 10px;
+        }
+
+        .footer-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*        SAVE TOAST                       */
+        /* ═══════════════════════════════════════ */
+        .save-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(60px);
+            background: var(--stone);
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            padding: 8px 24px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.35s;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .save-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ═══════════════════════════════════════ */
+        /*     DECORATIVE SEPARATOR                */
+        /* ═══════════════════════════════════════ */
+        .ornament {
+            text-align: center;
+            color: var(--gold-dim);
+            font-size: 0.7rem;
+            letter-spacing: 6px;
+            margin: 4px 0;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
 
+<div class="container">
+
+    <!-- ═══ HEADER ═══ -->
     <div class="header">
-        <div>USER: GHOSTROOT<br><span style="font-size: 1.4rem; font-weight: bold;">[ EDGAR MARKOV ]</span></div>
-        <div style="color: var(--neon-red); animation: blink 1s infinite;">● STANDALONE</div>
+        <div class="header-cross">✦ ✦ ✦</div>
+        <div class="header-title">Edgar Markov</div>
+        <div class="header-subtitle">Patriarch of the Markov Line</div>
+        <div class="header-rule"></div>
+        <div class="header-meta">
+            <span>Commander</span>
+            <span>✦</span>
+            <span>Vampires</span>
+        </div>
     </div>
 
+    <!-- ═══ LIFE TOTAL ═══ -->
     <div class="panel">
-        <h2>VITAL_SIGNS</h2>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
-                <button class="token-btn" style="width: 45px; height: 45px; font-size: 1.5rem;" onclick="updLife(-1)">-</button>
-                <span id="life-total" style="font-size: 3.5rem; font-weight: bold; color: #fff;">40</span>
-                <button class="token-btn" style="width: 45px; height: 45px; font-size: 1.5rem;" onclick="updLife(1)">+</button>
+        <div class="panel-label">— Vital Essence —</div>
+        <div class="life-section">
+            <div class="life-controls">
+                <button class="stone-btn" onclick="updLife(-5)">−5</button>
+                <button class="stone-btn" onclick="updLife(-1)">−</button>
+                <span class="life-value" id="life-total">40</span>
+                <button class="stone-btn" onclick="updLife(1)">+</button>
+                <button class="stone-btn" onclick="updLife(5)">+5</button>
             </div>
+            <div class="life-inscription">blood is the currency of eternity</div>
         </div>
-        <div class="stats-grid">
-            <div class="stat-box">COMMAND TAX<br>
-                <div style="display:flex; justify-content:center; gap:10px; margin-top:5px;">
-                    <button class="token-btn" onclick="upd('tax',-1)">-</button>
-                    <span id="tax" class="stat-value">0</span>
-                    <button class="token-btn" onclick="upd('tax',1)">+</button>
+        <div class="stats-row">
+            <div class="stat-cell">
+                <div class="stat-cell-label">Command Tax</div>
+                <div class="stat-cell-value" id="tax">0</div>
+                <div class="stat-cell-controls">
+                    <button class="sm-stone-btn" onclick="upd('tax', -1)">−</button>
+                    <button class="sm-stone-btn" onclick="upd('tax', 1)">+</button>
                 </div>
             </div>
-            <div class="stat-box" id="monarch-box" onclick="toggleState('monarch-box', 'THE MONARCH')" style="cursor:pointer;">
-                STATUS
-                <span id="monarch-box-text" class="stat-value" style="font-size: 0.8rem; margin-top:8px;">NEUTRAL</span>
+            <div class="toggle-cell" id="monarch-cell" onclick="toggle('monarch')">
+                <div class="toggle-label">Crown of Blood</div>
+                <div class="toggle-status" id="monarch-status">unclaimed</div>
             </div>
         </div>
     </div>
 
-    <div class="panel" style="border-color: var(--neon-purple);">
-        <h2 style="border-color: var(--neon-purple);">WIN_CON_MONITOR</h2>
-        <div class="stats-grid">
-            <div class="stat-box" id="loop-box" onclick="toggleState('loop-box', 'INFINITE LOOP', 'wincon-active')" style="cursor:pointer;">
-                BLOOD LOOP
-                <span id="loop-box-text" class="stat-value" style="font-size: 0.7rem; margin-top:8px;">OFFLINE</span>
+    <div class="ornament">⟡</div>
+
+    <!-- ═══ WIN CONDITIONS ═══ -->
+    <div class="panel panel-stained">
+        <div class="panel-label">— Rites of Victory —</div>
+        <div class="wincon-grid">
+            <div class="toggle-cell" id="loop-cell" onclick="toggle('loop')">
+                <div class="toggle-label">Blood Loop</div>
+                <div class="toggle-status" id="loop-status">dormant</div>
             </div>
-            <div class="stat-box" id="combat-box" onclick="toggleState('combat-box', 'INF COMBAT', 'wincon-active')" style="cursor:pointer;">
-                EXTRA COMBAT
-                <span id="combat-box-text" class="stat-value" style="font-size: 0.7rem; margin-top:8px;">OFFLINE</span>
+            <div class="toggle-cell" id="combat-cell" onclick="toggle('combat')">
+                <div class="toggle-label">Infinite Combat</div>
+                <div class="toggle-status" id="combat-status">dormant</div>
             </div>
-        </div>
-        <div style="font-size: 0.7rem; margin-top: 10px; color: var(--neon-purple); text-align: center;">
-            DRAIN ENGINE: <span id="vito-v" style="color: #fff;">INACTIVE</span>
+            <div class="toggle-cell wincon-full" id="drain-cell" onclick="toggle('drain')">
+                <div class="toggle-label">Drain Engine — Vito</div>
+                <div class="toggle-status" id="drain-status">silent</div>
+            </div>
         </div>
     </div>
 
+    <div class="ornament">✦</div>
+
+    <!-- ═══ COMMANDER DAMAGE ═══ -->
     <div class="panel">
-        <h2 style="border-color: var(--neon-red);">COMMANDER_DAMAGE</h2>
-        <div class="cmd-damage-grid">
-            <div class="stat-box">OP1<br><span id="cd1" class="stat-value">0</span>
-                <button class="token-btn" onclick="upd('cd1',-1)">-</button><button class="token-btn" onclick="upd('cd1',1)">+</button>
+        <div class="panel-label">— Wounds Inflicted —</div>
+        <div class="cmd-grid">
+            <div class="cmd-cell" id="cmd-1">
+                <div class="cmd-cell-label">Foe I</div>
+                <div class="cmd-cell-value" id="cd1">0</div>
+                <div class="cmd-cell-controls">
+                    <button class="sm-stone-btn" onclick="updCmd('cd1', -1)">−</button>
+                    <button class="sm-stone-btn" onclick="updCmd('cd1', 1)">+</button>
+                </div>
+                <div class="cmd-progress"><div class="cmd-progress-bar" id="cd1-bar" style="width: 0%"></div></div>
             </div>
-            <div class="stat-box">OP2<br><span id="cd2" class="stat-value">0</span>
-                <button class="token-btn" onclick="upd('cd2',-1)">-</button><button class="token-btn" onclick="upd('cd2',1)">+</button>
+            <div class="cmd-cell" id="cmd-2">
+                <div class="cmd-cell-label">Foe II</div>
+                <div class="cmd-cell-value" id="cd2">0</div>
+                <div class="cmd-cell-controls">
+                    <button class="sm-stone-btn" onclick="updCmd('cd2', -1)">−</button>
+                    <button class="sm-stone-btn" onclick="updCmd('cd2', 1)">+</button>
+                </div>
+                <div class="cmd-progress"><div class="cmd-progress-bar" id="cd2-bar" style="width: 0%"></div></div>
             </div>
-            <div class="stat-box">OP3<br><span id="cd3" class="stat-value">0</span>
-                <button class="token-btn" onclick="upd('cd3',-1)">-</button><button class="token-btn" onclick="upd('cd3',1)">+</button>
+            <div class="cmd-cell" id="cmd-3">
+                <div class="cmd-cell-label">Foe III</div>
+                <div class="cmd-cell-value" id="cd3">0</div>
+                <div class="cmd-cell-controls">
+                    <button class="sm-stone-btn" onclick="updCmd('cd3', -1)">−</button>
+                    <button class="sm-stone-btn" onclick="updCmd('cd3', 1)">+</button>
+                </div>
+                <div class="cmd-progress"><div class="cmd-progress-bar" id="cd3-bar" style="width: 0%"></div></div>
             </div>
         </div>
     </div>
 
+    <!-- ═══ TOKEN LOGISTICS ═══ -->
     <div class="panel">
-        <h2>TOKEN_LOGISTICS</h2>
-        <div class="token-row"><span>EDGAR TOKENS (1/1)</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('v',-1)">-</button><span id="v" class="count-display">0</span><button class="token-btn" onclick="upd('v',1)">+</button></div></div>
-        <div class="token-row"><span>BLOOD TOKENS</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('blood',-1)">-</button><span id="blood" class="count-display">0</span><button class="token-btn" onclick="upd('blood',1)">+</button></div></div>
-        <div class="token-row"><span>TREASURE</span><div style="display:flex;gap:10px;"><button class="token-btn" onclick="upd('t',-1)">-</button><span id="t" class="count-display">0</span><button class="token-btn" onclick="upd('t',1)">+</button></div></div>
-        <button class="btn" id="blessing-btn" onclick="toggleState('blessing-btn', 'CITY\'S BLESSING', 'blessing-active')" style="margin-top:15px; border-style: dashed;">ASCEND: INACTIVE</button>
+        <div class="panel-label">— The Legion —</div>
+
+        <div class="token-row">
+            <div>
+                <div class="token-name">Vampire Thralls</div>
+                <div class="token-sub">1/1 Creature — Vampire</div>
+            </div>
+            <div class="token-controls">
+                <button class="sm-stone-btn" onclick="upd('vamp', -1)">−</button>
+                <span class="token-value" id="vamp">0</span>
+                <button class="sm-stone-btn" onclick="upd('vamp', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="token-row">
+            <div>
+                <div class="token-name">Blood Tokens</div>
+                <div class="token-sub">Artifact — Blood</div>
+            </div>
+            <div class="token-controls">
+                <button class="sm-stone-btn" onclick="upd('blood', -1)">−</button>
+                <span class="token-value" id="blood">0</span>
+                <button class="sm-stone-btn" onclick="upd('blood', 1)">+</button>
+            </div>
+        </div>
+
+        <div class="token-row">
+            <div>
+                <div class="token-name">Treasure</div>
+                <div class="token-sub">Artifact — Treasure</div>
+            </div>
+            <div class="token-controls">
+                <button class="sm-stone-btn" onclick="upd('treas', -1)">−</button>
+                <span class="token-value" id="treas">0</span>
+                <button class="sm-stone-btn" onclick="upd('treas', 1)">+</button>
+            </div>
+        </div>
+
+        <button class="ascend-btn" id="ascend-btn" onclick="toggle('blessing')">
+            ◇ Ascend — Inactive
+        </button>
     </div>
 
+    <div class="ornament">⟡</div>
+
+    <!-- ═══ STRATEGIC ANALYSIS ═══ -->
     <div class="panel">
-        <h2>STRATEGIC_ANALYSIS</h2>
-        <div style="height: 100px;"><canvas id="manaCurve"></canvas></div>
-        <div class="mana-grid">
-            <div><div class="mana-sym w">W</div>23%</div>
-            <div><div class="mana-sym b">B</div>70%</div>
-            <div><div class="mana-sym r">R</div>11%</div>
-            <div><div class="mana-sym c">C</div>15%</div>
+        <div class="panel-label">— Arcane Distribution —</div>
+        <div class="chart-wrap">
+            <canvas id="manaCurve"></canvas>
+        </div>
+        <div class="mana-pips">
+            <div class="mana-pip">
+                <div class="mana-circle mana-w">W</div>
+                <span class="mana-pct">23%</span>
+            </div>
+            <div class="mana-pip">
+                <div class="mana-circle mana-b">B</div>
+                <span class="mana-pct">70%</span>
+            </div>
+            <div class="mana-pip">
+                <div class="mana-circle mana-r">R</div>
+                <span class="mana-pct">11%</span>
+            </div>
+            <div class="mana-pip">
+                <div class="mana-circle mana-c">C</div>
+                <span class="mana-pct">15%</span>
+            </div>
         </div>
     </div>
 
-    <a href="https://moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="btn">VIEW FULL DECKLIST</a>
-    <button class="btn btn-red" onclick="resetAll()">[ SYSTEM_RESET ]</button>
+    <!-- ═══ ACTIONS ═══ -->
+    <a href="https://moxfield.com/decks/32hrkfk7C0qOt-B59XEfXQ" class="action-btn" target="_blank">
+        ✦ View the Full Grimoire ✦
+    </a>
+    <button class="action-btn action-btn-blood" id="reset-btn" onclick="resetAll()">
+        Purge All &mdash; Reset
+    </button>
 
-    <script>
-        new Chart(document.getElementById('manaCurve'), {
-            type: 'bar',
-            data: {
-                labels: ['0', '1', '2', '3', '4', '5', '6', '7+'],
-                datasets: [{ data: [1, 7, 15, 14, 12, 6, 5, 1], backgroundColor: 'rgba(0, 242, 255, 0.2)', borderColor: '#00f2ff', borderWidth: 1 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { ticks: { color: '#00f2ff' } } } }
+    <div class="footer">
+        <div class="footer-rule"></div>
+        <div class="footer-text">"The bloodline endures."</div>
+    </div>
+</div>
+
+<!-- Save toast -->
+<div class="save-toast" id="save-toast">Inscribed</div>
+
+<script>
+    // ═══ STATE ═══
+    const SAVE_KEY = 'edgar_markov_cathedral';
+
+    const defaults = {
+        life: 40, tax: 0,
+        vamp: 0, blood: 0, treas: 0,
+        cd1: 0, cd2: 0, cd3: 0,
+        monarch: false, loop: false, combat: false, drain: false, blessing: false
+    };
+
+    let state = loadState();
+
+    function loadState() {
+        try {
+            const s = localStorage.getItem(SAVE_KEY);
+            if (s) return { ...defaults, ...JSON.parse(s) };
+        } catch(e) {}
+        return { ...defaults };
+    }
+
+    function saveState() {
+        try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+            const t = document.getElementById('save-toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 700);
+        } catch(e) {}
+    }
+
+    // ═══ RENDER ═══
+    function render() {
+        const lifeEl = document.getElementById('life-total');
+        lifeEl.textContent = state.life;
+        lifeEl.classList.remove('danger', 'critical');
+        if (state.life <= 0) lifeEl.classList.add('critical');
+        else if (state.life <= 10) lifeEl.classList.add('danger');
+
+        ['tax', 'vamp', 'blood', 'treas'].forEach(k => {
+            document.getElementById(k).textContent = state[k];
         });
 
-        function upd(id, n) { 
-            let e = document.getElementById(id); 
-            e.innerText = Math.max(0, parseInt(e.innerText) + n); 
+        ['cd1', 'cd2', 'cd3'].forEach((k, i) => {
+            document.getElementById(k).textContent = state[k];
+            const pct = Math.min((state[k] / 21) * 100, 100);
+            document.getElementById(k + '-bar').style.width = pct + '%';
+            document.getElementById('cmd-' + (i + 1)).classList.toggle('cmd-lethal', state[k] >= 21);
+        });
+
+        renderToggle('monarch-cell', 'monarch-status', state.monarch, 'is-monarch', 'Crowned', 'Unclaimed');
+        renderToggle('loop-cell', 'loop-status', state.loop, 'is-wincon', 'Awakened', 'Dormant');
+        renderToggle('combat-cell', 'combat-status', state.combat, 'is-wincon', 'Unleashed', 'Dormant');
+        renderToggle('drain-cell', 'drain-status', state.drain, 'is-drain', 'Draining', 'Silent');
+
+        const bBtn = document.getElementById('ascend-btn');
+        bBtn.classList.toggle('is-blessing', state.blessing);
+        bBtn.textContent = state.blessing ? '◆ Ascend — City\'s Blessing' : '◇ Ascend — Inactive';
+    }
+
+    function renderToggle(cellId, statusId, active, cls, onTxt, offTxt) {
+        document.getElementById(cellId).classList.toggle(cls, active);
+        document.getElementById(statusId).textContent = active ? onTxt : offTxt;
+    }
+
+    // ═══ ACTIONS ═══
+    function updLife(n) {
+        state.life = Math.max(0, state.life + n);
+        saveState(); render();
+    }
+
+    function upd(key, n) {
+        state[key] = Math.max(0, state[key] + n);
+        saveState(); render();
+    }
+
+    function updCmd(key, n) {
+        state[key] = Math.max(0, Math.min(21, state[key] + n));
+        saveState(); render();
+    }
+
+    function toggle(key) {
+        state[key] = !state[key];
+        saveState(); render();
+    }
+
+    let resetPending = false;
+    let resetTimer = null;
+
+    function resetAll() {
+        const btn = document.getElementById('reset-btn');
+        if (!resetPending) {
+            resetPending = true;
+            btn.textContent = '!! Confirm Purge !!';
+            btn.style.borderColor = '#c0392b';
+            btn.style.boxShadow = '0 0 20px rgba(139, 26, 26, 0.4)';
+            resetTimer = setTimeout(() => {
+                resetPending = false;
+                btn.innerHTML = 'Purge All &mdash; Reset';
+                btn.style.borderColor = '';
+                btn.style.boxShadow = '';
+            }, 3000);
+        } else {
+            clearTimeout(resetTimer);
+            resetPending = false;
+            Object.assign(state, { ...defaults });
+            saveState(); render();
+            btn.innerHTML = 'Purge All &mdash; Reset';
+            btn.style.borderColor = '';
+            btn.style.boxShadow = '';
         }
-        function updLife(n) {
-            let e = document.getElementById('life-total');
-            e.innerText = parseInt(e.innerText) + n;
-        }
-        function toggleState(id, label, activeClass = 'toggle-active') {
-            let e = document.getElementById(id);
-            e.classList.toggle(activeClass);
-            let textSpan = document.getElementById(id + '-text');
-            
-            if (id === 'blessing-btn') {
-                e.innerText = e.classList.contains(activeClass) ? `ASCEND: ${label}` : 'ASCEND: INACTIVE';
-            } else if (textSpan) {
-                textSpan.innerText = e.classList.contains(activeClass) ? 'ACTIVE' : 'OFFLINE';
+    }
+
+    // ═══ CHART ═══
+    new Chart(document.getElementById('manaCurve'), {
+        type: 'bar',
+        data: {
+            labels: ['0', '1', '2', '3', '4', '5', '6', '7+'],
+            datasets: [{
+                data: [1, 7, 15, 14, 12, 6, 5, 1],
+                backgroundColor: 'rgba(201, 168, 76, 0.12)',
+                borderColor: 'rgba(201, 168, 76, 0.35)',
+                borderWidth: 1,
+                borderRadius: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { display: false },
+                x: {
+                    ticks: {
+                        color: 'rgba(201, 168, 76, 0.35)',
+                        font: { family: 'Cinzel', size: 9, weight: '600' }
+                    },
+                    grid: { display: false },
+                    border: { color: 'rgba(201, 168, 76, 0.1)' }
+                }
             }
         }
-        function resetAll() {
-            if(confirm("INITIALIZE RESET?")) {
-                document.getElementById('life-total').innerText = '40';
-                ['v','blood','t','cd1','cd2','cd3','tax'].forEach(i => document.getElementById(i).innerText = '0');
-                ['monarch-box','loop-box','combat-box'].forEach(i => {
-                    document.getElementById(i).classList.remove('toggle-active', 'wincon-active');
-                    document.getElementById(i+'-text').innerText = 'OFFLINE';
-                });
-                let bl = document.getElementById('blessing-btn');
-                bl.classList.remove('blessing-active');
-                bl.innerText = 'ASCEND: INACTIVE';
-            }
-        }
-    </script>
+    });
+
+    // ═══ INIT ═══
+    render();
+</script>
+
 </body>
 </html>
